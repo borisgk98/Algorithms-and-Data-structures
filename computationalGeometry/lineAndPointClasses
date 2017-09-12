@@ -1,0 +1,105 @@
+#include <iostream>
+#include <cmath>
+using namespace std;
+
+const double PI = 3.141692635818;
+
+double angle(int x1, int y1, int x0, int y0, int x2, int y2){
+	double rad=atan2((double)(abs(x1-x0)), (double)(abs(y1-y0))) + atan2((double)(abs(x2-x0)), (double)(abs(y2-y0)));
+	return abs(rad)*(180/M_PI);
+}
+
+double sqr(double a) {
+	return a * a;
+}
+
+class point {
+public:
+	point() {}
+	point(int X, int Y) {
+		x = double(X);
+		y = double(Y);
+	}
+	point operator+ (point &a) {
+		return point(x + a.x, y + a.y);
+	}
+	double operator* (point &a) { //скалярное произведение
+		return x * a.x + a.y * y;
+	}
+	double operator^ (point &a) { //псевдоскалярное произведение
+		return x * a.y - y * a.x;
+	}
+	double dir(point &a) {
+		return sqrt(sqr(a.x - x) + sqr(a.y - y));
+	}
+	point operator! () {
+		return point(-x, -y);
+	}
+	double len() {
+		return sqrt(sqr(x) + sqr(y));
+	}
+	point normir() {
+
+	}
+	double x, y;
+};
+
+class line {
+public:
+	line(double &x1, double &y1, double &x2, double &y2){
+		A = y1 - y2;
+		B = x2 - x1;
+		C = -(A * x1) - B * y1;
+	}
+	line(point &a, point &b) {
+		A = a.y - b.y;
+		B = b.x - a.x;
+		C = -(A * a.x) - B * a.y;
+	}
+	void intersection(line b){ //пересечение
+		double a1 = A,
+			a2 = b.A,
+			d = a1 / a2,
+			b1 = B,
+			b2 = b.B*d,
+			c1 = C,
+			c2 = b.C*d; // решаем систему Ax - Bx - C = 0 && A1x - A1y - C1 = 0
+		y = (c2 - c1) / (b1 - b2);
+		x = (c1 - (b1*y)) / a1;
+	}
+	double angle(line c){
+		double a = 1,
+			b = (-(A + C)) / B,
+			a1 = 1,
+			b1 = (-(c.A + c.C)) / c.B
+			, u; //а и b - коорд.вектора пр.а, а1 и b1 - коорд.вектора пр.b
+		u = (a*a1 - b1*b) / (abs(sqrt(a*a + b*b))*abs(sqrt(a1*a1 + b1*b1)));
+		u = asin(u);
+		return u*(180 / PI);
+	}
+	double dir(point p) {
+		return abs(A * p.x + B * p.y + C) / sqrt(sqr(A) + sqr(B));
+	}
+	void cout(){
+		std::cout << A << "x" << (B >= 0 ? "+" : 0) << B << "y" << (C >= 0 ? "+" : 0) << C << "=0";
+	}
+	double A, B, C;
+	double x, y;
+};
+
+double triangle_square(point &a, point &b) {
+	point q = !(a + b), w = !a;
+	return abs(q^w) / 2;
+}
+
+//iostream& operator>>(iostream &stream, point p) {
+//	cin >> p.x >> p.y;
+//	return stream;
+//}
+
+int main() {
+	cout.precision(10);
+	point p, p1, p2;
+	cin >> p.x >> p.y >> p1.x >> p1.y >> p2.x >> p2.y;
+	cout << line(p1, p2).dir(p);
+}
